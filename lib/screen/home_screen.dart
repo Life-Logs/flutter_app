@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/screen/routine_screen.dart';
+import 'package:lifelog/screen/main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: ((context) => const RoutineScreen()),
+                        builder: ((context) => const MainScreen()),
                       ));
                 },
                 style: ElevatedButton.styleFrom(
