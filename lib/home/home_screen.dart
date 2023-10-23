@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/screen/main_screen.dart';
+import 'package:lifelog/main/main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

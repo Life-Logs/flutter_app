@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/screen/home_screen.dart';
+import 'package:lifelog/home/home_screen.dart';
 
 void main() {
   runApp(const MyApp());

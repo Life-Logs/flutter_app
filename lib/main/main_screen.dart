@@ -14,22 +14,10 @@ class _MainScreenState extends State<MainScreen> {
       TextStyle(fontSize: 13, fontWeight: FontWeight.bold);
 
   List<Widget> body = const [
-    Text(
-      'Index 0: 통계',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: 루틴',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: 일지',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: 설정',
-      style: optionStyle,
-    ),
+    Text('통계', style: optionStyle),
+    Text('루틴', style: optionStyle),
+    Text('일지', style: optionStyle),
+    Text('설정', style: optionStyle),
   ];
 
   void onNavTap(newIndex) {
