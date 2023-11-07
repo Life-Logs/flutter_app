@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  // final GoogleSignInAccount user;
+
+  const MainScreen({
+    super.key,
+    // required this.user,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();

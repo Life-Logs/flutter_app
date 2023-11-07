@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/main/main_screen.dart';
+import 'package:lifelog/services/api_services.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,29 +19,50 @@ class HomeScreen extends StatelessWidget {
                 color: const Color(0xff64705B),
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: ((context) => const MainScreen()),
-                      ));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff64705B),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+              child: Builder(builder: (context) {
+                return ElevatedButton(
+                  onPressed: () => signIn(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  '로그인',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+                  child: const Text(
+                    'Login with Google',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                );
+              }),
             ),
           ),
         ],
       ),
     );
+  }
+
+  // Future signIn(context) async {
+  // final user = await GoogleSignInApi.login();
+
+  // if (user == null) {
+  //   ScaffoldMessenger.of(context)
+  //       .showSnackBar(const SnackBar(content: Text('Sign in Failed')));
+  // } else {
+  //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+  //     builder: (context) => MainScreen(user: user),
+  //   ));
+  // }
+  // }
+
+  void signIn(BuildContext context) {
+    ApiService.getId().then((response) {
+      if (response.statusCode == 200) {
+        String cookies = response.headers['set-cookie'];
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    }).catchError((error) {
+      print('Error: $error');
+    });
   }
 }
