@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifelog/main/widgets/routine_widget.dart';
 
 class MainScreen extends StatefulWidget {
   // final GoogleSignInAccount user;
@@ -20,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> body = const [
     Text('통계', style: optionStyle),
-    Text('루틴', style: optionStyle),
+    RoutineWidget(),
     Text('일지', style: optionStyle),
     Text('설정', style: optionStyle),
   ];
