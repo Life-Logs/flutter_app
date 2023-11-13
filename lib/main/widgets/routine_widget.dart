@@ -24,8 +24,19 @@ class _RoutineWidgetState extends State<RoutineWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffebf6e1),
-      body: Column(
-        children: cards.asMap().entries.map((cardEntry) {
+      body: Column(children: [
+        const Text(
+          '루틴', // 추가된 텍스트
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.normal,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        ...cards.asMap().entries.map((cardEntry) {
           final index = cardEntry.key;
           final card = cardEntry.value;
 
@@ -34,13 +45,24 @@ class _RoutineWidgetState extends State<RoutineWidget> {
             child: GestureDetector(
               onTap: () => onClick(index),
               child: Container(
-                height: card.isClicked ? 200 : 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xfff5fdee),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-              ),
+                  height: card.isClicked ? 200 : 60,
+                  decoration: BoxDecoration(
+                    color: const Color(0xfff5fdee),
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset:
+                            const Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: const Center(
+                    child: Text('제목입니다'),
+                  )),
             ),
           );
         }).toList(),
