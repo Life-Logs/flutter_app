@@ -44,6 +44,14 @@ class _RoutineWidgetState extends State<RoutineWidget> {
             ),
           );
         }).toList(),
+      ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Colors.black,
+        child: const Icon(
+          Icons.add,
+          size: 25,
+        ),
       ),
     );
   }
