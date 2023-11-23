@@ -61,6 +61,15 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    signingConfigs {
+        debug {
+         storeFile file('../../keystore.jks')
+         storePassword 'lifelog'
+         keyPassword 'lifelog'
+         keyAlias 'mykey'
+        }
+    }
 }
 
 flutter {

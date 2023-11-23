@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifelog/api/google_signin_api.dart';
 import 'package:lifelog/main/main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -42,35 +43,25 @@ class HomeScreen extends StatelessWidget {
   }
 
 // google login 창
-  // Future signIn(context) async {
-  // final user = await GoogleSignInApi.login();
+  Future signIn(context) async {
+    final user = await GoogleSignInApi.login();
 
-  // if (user == null) {
-  //   ScaffoldMessenger.of(context)
-  //       .showSnackBar(const SnackBar(content: Text('Sign in Failed')));
-  // } else {
-  //   Navigator.of(context).pushReplacement(MaterialPageRoute(
-  //     builder: (context) => MainScreen(user: user),
-  //   ));
-  // }
-  // }
-
-// google login api
-  // void signIn(BuildContext context) {
-  //   ApiService.getId().then((response) {
-  //     if (response.statusCode == 200) {
-  //       String cookies = response.headers['set-cookie'];
-  //     } else {
-  //       print('Request failed with status: ${response.statusCode}');
-  //     }
-  //   }).catchError((error) {
-  //     print('Error: $error');
-  //   });
-  // }
+    if (user == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Sign in Failed')));
+    } else {
+      String accessToken =
+          await user.authentication.then((auth) => auth.accessToken!);
+      print('Access Token: $accessToken');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => const MainScreen(),
+      ));
+    }
+  }
 
   // 로그인 인증 없이 로그인
-  void signIn(BuildContext context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const MainScreen()));
-  }
+  // void signIn(BuildContext context) {
+  //   Navigator.push(
+  //       context, MaterialPageRoute(builder: (context) => const MainScreen()));
+  // }
 }

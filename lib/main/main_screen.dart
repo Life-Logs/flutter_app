@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/main/widgets/routine_widget.dart';
+import 'package:lifelog/main/routine/widgets/routine_widget.dart';
 
 class MainScreen extends StatefulWidget {
   // final GoogleSignInAccount user;
