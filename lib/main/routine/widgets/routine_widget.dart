@@ -13,6 +13,7 @@ class CardModel {
   String category;
   String period;
   DateTime activatedAt;
+  List tags;
   bool isClicked;
   bool isActive;
 
@@ -21,6 +22,7 @@ class CardModel {
     required this.category,
     required this.period,
     required this.activatedAt,
+    required this.tags,
     this.isClicked = false,
     this.isActive = true,
   });
@@ -29,29 +31,29 @@ class CardModel {
 class _RoutineWidgetState extends State<RoutineWidget> {
   List<CardModel> cards = [
     CardModel(
-      title: '커피',
-      category: '카운트',
-      period: '평일',
-      activatedAt: DateTime(2023, 11, 23),
-    ),
+        title: '커피',
+        category: '카운트',
+        period: '평일',
+        activatedAt: DateTime(2023, 11, 23),
+        tags: ['음식', '커피']),
     CardModel(
-      title: '무산소',
-      category: '카운트',
-      period: '평일',
-      activatedAt: DateTime(2023, 11, 23),
-    ),
+        title: '무산소',
+        category: '카운트',
+        period: '평일',
+        activatedAt: DateTime(2023, 11, 23),
+        tags: ['건강', '취미']),
     CardModel(
-      title: '유산소',
-      category: '체크박스',
-      period: '평일',
-      activatedAt: DateTime(2023, 11, 23),
-    ),
+        title: '유산소',
+        category: '체크박스',
+        period: '평일',
+        activatedAt: DateTime(2023, 11, 23),
+        tags: ['취미']),
     CardModel(
-      title: '컴공 공부',
-      category: '퍼센트',
-      period: '평일',
-      activatedAt: DateTime(2023, 11, 23),
-    ),
+        title: '컴공 공부',
+        category: '퍼센트',
+        period: '평일',
+        activatedAt: DateTime(2023, 11, 23),
+        tags: ['공부']),
   ];
 
   void toggleCardState(int index) {
@@ -65,6 +67,39 @@ class _RoutineWidgetState extends State<RoutineWidget> {
       cards[index].isActive = !cards[index].isActive;
       cards[index].isClicked = false;
     });
+  }
+
+  Widget buildInfoRow(String? label, String? value, List? tag) {
+    String tagValue = tag?.map((tag) => '#$tag').join(' ') ?? '';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Text(
+            label ?? '',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Text(
+            tagValue,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(width: 20),
+          Text(
+            value ?? '',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -82,7 +117,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                   onTap: () => toggleCardState(index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    height: card.isActive && card.isClicked ? 150 : 60,
+                    height: card.isActive && card.isClicked ? 200 : 60,
                     decoration: BoxDecoration(
                       color: card.isActive
                           ? const Color(0xfff5fdee)
@@ -99,11 +134,10 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                     ),
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
                       child: ListView(children: [
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,63 +161,22 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                             if (card.isActive && card.isClicked)
                               Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        '구분',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Text(
-                                        card.category,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )
-                                    ],
+                                  buildInfoRow('구분', card.category, null),
+                                  buildInfoRow('반복', card.period, null),
+                                  buildInfoRow(
+                                      '활성', card.activatedAt.toString(), null),
+                                  const SizedBox(
+                                    height: 10,
                                   ),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        '반복',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Text(
-                                        card.period,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )
-                                    ],
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color.fromARGB(255, 188, 191, 185),
                                   ),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        '활성',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Text(
-                                        card.activatedAt.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )
-                                    ],
+                                  const SizedBox(
+                                    height: 10,
                                   ),
+                                  buildInfoRow('', null, card.tags),
                                 ],
                               ),
                           ],
