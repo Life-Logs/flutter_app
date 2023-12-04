@@ -56,6 +56,10 @@ class _RoutineWidgetState extends State<RoutineWidget> {
         tags: ['공부']),
   ];
 
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _goalController = TextEditingController();
+  String _selectedCategory = '카운트'; // 초기값 설정
+
   void toggleCardState(int index) {
     setState(() {
       cards[index].isClicked = !cards[index].isClicked;
@@ -188,10 +192,11 @@ class _RoutineWidgetState extends State<RoutineWidget> {
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CreateRoutine()),
-          );
+          _showAddRoutineCard();
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => CreateRoutine()),
+          // );
         },
         backgroundColor: Colors.black,
         child: const Icon(
@@ -202,6 +207,128 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     );
   }
 
+  void _showAddRoutineCard() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '루틴 추가',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                // 이름 입력창
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('이름', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('구분', style: TextStyle(fontWeight: FontWeight.bold)),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedCategory,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedCategory = newValue!;
+                        });
+                      },
+                      items: <String>['카운트', '퍼센트', '체크박스']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                // 목표 입력창
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('목표', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: _goalController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                // 태그 입력창
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('태그', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: _goalController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                // 닫기버튼
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Bottom Sheet를 닫는 메서드 호출
+                        Navigator.pop(context);
+                      },
+                      child: Text('취소'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Bottom Sheet를 닫는 메서드 호출
+                        Navigator.pop(context);
+                      },
+                      child: Text('저장'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 // const Column(children: [
 //         Text(
 //           '루틴', // 추가된 텍스트
@@ -243,4 +370,4 @@ class _RoutineWidgetState extends State<RoutineWidget> {
   //   separatorBuilder: separatorBuilder,
   //   itemCount: itemCount,)
   // }
-}
+
