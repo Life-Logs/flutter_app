@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lifelog/main/routine/create_routine.dart';
 
 class RoutineWidget extends StatefulWidget {
   const RoutineWidget({super.key});
@@ -56,9 +55,10 @@ class _RoutineWidgetState extends State<RoutineWidget> {
         tags: ['공부']),
   ];
 
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _goalController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _goalController = TextEditingController();
   String _selectedCategory = '카운트'; // 초기값 설정
+  String _selectedPeriod = '매일'; // 초기값 설정
 
   void toggleCardState(int index) {
     setState(() {
@@ -211,117 +211,186 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(20),
         ),
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '루틴 추가',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+        return SingleChildScrollView(
+          child: Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 35),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '루틴 추가',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                // 이름 입력창
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('이름', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
+                  const SizedBox(height: 10),
+                  // 이름 입력창
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('이름',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.0),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('구분', style: TextStyle(fontWeight: FontWeight.bold)),
-                    DropdownButton<String>(
-                      isExpanded: true,
-                      value: _selectedCategory,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedCategory = newValue!;
-                        });
-                      },
-                      items: <String>['카운트', '퍼센트', '체크박스']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.0),
-
-                // 목표 입력창
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('목표', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextField(
-                      controller: _goalController,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('구분',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedCategory,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedCategory = newValue!;
+                          });
+                        },
+                        items: <String>['카운트', '퍼센트', '체크박스']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.0),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                // 태그 입력창
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('태그', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextField(
-                      controller: _goalController,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
+                  // 목표 입력창
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('목표',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextField(
+                        controller: _goalController,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.0),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                // 닫기버튼
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Bottom Sheet를 닫는 메서드 호출
-                        Navigator.pop(context);
-                      },
-                      child: Text('취소'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Bottom Sheet를 닫는 메서드 호출
-                        Navigator.pop(context);
-                      },
-                      child: Text('저장'),
-                    ),
-                  ],
-                ),
-              ],
+                  // 태그 입력창
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('태그',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextField(
+                        controller: _goalController,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // 날짜 및 시간
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('날짜 및 시간',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('언제부터 시작할까요?',
+                              style: TextStyle(fontWeight: FontWeight.w400)),
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 193, 190, 190),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: const Text(
+                              '23.12.06',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 193, 190, 190),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Column(
+                            children: [
+                              DropdownButton<String>(
+                                isExpanded: true,
+                                value: _selectedPeriod,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedPeriod = newValue!;
+                                  });
+                                },
+                                items: <String>[
+                                  '매주',
+                                  '매일',
+                                  '평일',
+                                  '주말'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // 닫기버튼
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          // Bottom Sheet를 닫는 메서드 호출
+                          Navigator.pop(context);
+                        },
+                        child: const Text('취소'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Bottom Sheet를 닫는 메서드 호출
+                          Navigator.pop(context);
+                        },
+                        child: const Text('저장'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -329,6 +398,24 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     );
   }
 }
+
+// DropdownButton<String>(
+//                           isExpanded: true,
+//                           value: _selectedPeriod,
+//                           onChanged: (String? newValue) {
+//                             setState(() {
+//                               _selectedPeriod = newValue!;
+//                             });
+//                           },
+//                           items: <String>['매주', '매일', '평일', '주말']
+//                               .map<DropdownMenuItem<String>>((String value) {
+//                             return DropdownMenuItem<String>(
+//                               value: value,
+//                               child: Text(value),
+//                             );
+//                           }).toList(),
+//                         )
+
 // const Column(children: [
 //         Text(
 //           '루틴', // 추가된 텍스트
@@ -342,32 +429,31 @@ class _RoutineWidgetState extends State<RoutineWidget> {
 //           height: 20,
 //         ),
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     backgroundColor: const Color(0xffebf6e1),
-  //     body: FutureBuilder(
-  //       builder: ((context, snapshot) {
-  //         if (snapshot.hasData) {
-  //           return const Column(
-  //             children: [
-  //               SizedBox(height: 30),
-  //               Expanded(child: makeRoutineList(snapshot)),
-  //             ],
-  //           );
-  //         }
-  //       }),
-  //     ),
-  //   );
-  // }
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     backgroundColor: const Color(0xffebf6e1),
+//     body: FutureBuilder(
+//       builder: ((context, snapshot) {
+//         if (snapshot.hasData) {
+//           return const Column(
+//             children: [
+//               SizedBox(height: 30),
+//               Expanded(child: makeRoutineList(snapshot)),
+//             ],
+//           );
+//         }
+//       }),
+//     ),
+//   );
+// }
 
-  // ListView makeRoutineList(AsyncSnapshot<List<>> snapshot) {
-  //   return ListView.separated(
-  //     itemBuilder: (context, index) {
-  //       return null;
+// ListView makeRoutineList(AsyncSnapshot<List<>> snapshot) {
+//   return ListView.separated(
+//     itemBuilder: (context, index) {
+//       return null;
 
-  //   },
-  //   separatorBuilder: separatorBuilder,
-  //   itemCount: itemCount,)
-  // }
-
+//   },
+//   separatorBuilder: separatorBuilder,
+//   itemCount: itemCount,)
+// }
