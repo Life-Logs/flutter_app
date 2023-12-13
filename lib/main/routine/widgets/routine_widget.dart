@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifelog/main/routine/create_routine.dart';
+import 'package:lifelog/models/routine_model.dart';
+import 'package:lifelog/services/api_services.dart';
 
 class RoutineWidget extends StatefulWidget {
   const RoutineWidget({super.key});
@@ -56,9 +58,12 @@ class _RoutineWidgetState extends State<RoutineWidget> {
         tags: ['공부']),
   ];
 
-  void toggleCardState(int index) {
+  final Future<List<RoutineModel>> futureRoutine = ApiService.getAllRoutine();
+  final Map<int, bool> clickedStateMap = {};
+
+  void toggleCardState(int id) {
     setState(() {
-      cards[index].isClicked = !cards[index].isClicked;
+      clickedStateMap[id] = !(clickedStateMap[id] ?? false);
     });
   }
 
@@ -106,102 +111,16 @@ class _RoutineWidgetState extends State<RoutineWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffebf6e1),
-      body: ListView.builder(
-          itemCount: cards.length,
-          itemBuilder: (context, index) {
-            CardModel card = cards[index];
-
-            return Dismissible(
-              key: UniqueKey(),
-              onDismissed: (_) {
-                setState(() {
-                  cards.removeAt(index);
-                });
-              },
-              background: Container(
-                  alignment: Alignment.centerRight,
-                  color: Colors.red,
-                  child: const Text(
-                    "삭제",
-                    style: TextStyle(fontSize: 25),
-                  )),
-              child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: GestureDetector(
-                    onTap: () => toggleCardState(index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      height: card.isActive && card.isClicked ? 200 : 60,
-                      decoration: BoxDecoration(
-                        color: card.isActive
-                            ? const Color(0xfff5fdee)
-                            : const Color(0xffC5DDBC),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 5),
-                        child: ListView(children: [
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    card.title,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Switch(
-                                    value: card.isActive,
-                                    onChanged: (newValue) {
-                                      switchState(index);
-                                    },
-                                    activeColor: const Color(0xff34C759),
-                                  )
-                                ],
-                              ),
-                              if (card.isActive && card.isClicked)
-                                Column(
-                                  children: [
-                                    buildInfoRow('구분', card.category, null),
-                                    buildInfoRow('반복', card.period, null),
-                                    buildInfoRow('활성',
-                                        card.activatedAt.toString(), null),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Divider(
-                                      thickness: 1,
-                                      height: 1,
-                                      color: Color.fromARGB(255, 188, 191, 185),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    buildInfoRow('', null, card.tags),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ]),
-                      ),
-                    ),
-                  )),
-            );
-          }),
+      body: FutureBuilder(
+        future: futureRoutine,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return makeList(snapshot);
+          } else {
+            return const CircularProgressIndicator();
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddRoutineCard();
@@ -229,5 +148,106 @@ class _RoutineWidgetState extends State<RoutineWidget> {
         return const CreateRoutine();
       },
     );
+  }
+
+  ListView makeList(AsyncSnapshot<List<RoutineModel>> snapshot) {
+    return ListView.separated(
+        itemBuilder: (context, index) {
+          var card = snapshot.data![index];
+
+          return Dismissible(
+            key: UniqueKey(),
+            onDismissed: (_) {
+              setState(() {
+                cards.removeAt(index);
+              });
+            },
+            background: Container(
+                alignment: Alignment.centerRight,
+                color: Colors.red,
+                child: const Text(
+                  "삭제",
+                  style: TextStyle(fontSize: 25),
+                )),
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: GestureDetector(
+                  onTap: () => toggleCardState(card.id),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    height: clickedStateMap[card.id] ?? false ? 200 : 60,
+                    decoration: BoxDecoration(
+                      color: card.isActived
+                          ? const Color(0xfff5fdee)
+                          : const Color(0xffC5DDBC),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: ListView(children: [
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  card.name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Switch(
+                                  value: card.isActived,
+                                  onChanged: (newValue) {
+                                    switchState(index);
+                                  },
+                                  activeColor: const Color(0xff34C759),
+                                )
+                              ],
+                            ),
+                            if (card.isActived &&
+                                (clickedStateMap[card.id] ?? false))
+                              Column(
+                                children: [
+                                  buildInfoRow('구분', card.type, null),
+                                  buildInfoRow(
+                                      '반복', card.datetime.toString(), null),
+                                  buildInfoRow(
+                                      '활성', card.activedAt.toString(), null),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color.fromARGB(255, 188, 191, 185),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  buildInfoRow('', null, card.routineTags),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ]),
+                    ),
+                  ),
+                )),
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 20),
+        itemCount: snapshot.data!.length);
   }
 }
