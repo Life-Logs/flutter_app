@@ -1,7 +1,7 @@
 class RoutineModel {
   final int id;
   final String name, type;
-  final bool isActived;
+  bool isActived, isClicked;
   final List<String> routineTags;
   final DateTime? activedAt, inactivedAt;
   final Map<String, dynamic> datetime;
@@ -18,5 +18,6 @@ class RoutineModel {
             : null,
         inactivedAt = json['inactivedAt'] != null
             ? DateTime.parse(json['inactivedAt'])
-            : null;
+            : null,
+        isClicked = false;
 }

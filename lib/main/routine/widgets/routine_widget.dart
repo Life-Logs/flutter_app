@@ -31,33 +31,6 @@ class CardModel {
 }
 
 class _RoutineWidgetState extends State<RoutineWidget> {
-  List<CardModel> cards = [
-    CardModel(
-        title: '커피',
-        category: '카운트',
-        period: '평일',
-        activatedAt: DateTime(2023, 11, 23),
-        tags: ['음식', '커피']),
-    CardModel(
-        title: '무산소',
-        category: '카운트',
-        period: '평일',
-        activatedAt: DateTime(2023, 11, 23),
-        tags: ['건강', '취미']),
-    CardModel(
-        title: '유산소',
-        category: '체크박스',
-        period: '평일',
-        activatedAt: DateTime(2023, 11, 23),
-        tags: ['취미']),
-    CardModel(
-        title: '컴공 공부',
-        category: '퍼센트',
-        period: '평일',
-        activatedAt: DateTime(2023, 11, 23),
-        tags: ['공부']),
-  ];
-
   final Future<List<RoutineModel>> futureRoutine = ApiService.getAllRoutine();
   final Map<int, bool> clickedStateMap = {};
 
@@ -67,10 +40,10 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     });
   }
 
-  void switchState(int index) {
+  void switchState(int index, AsyncSnapshot<List<RoutineModel>> snapshot) {
     setState(() {
-      cards[index].isActive = !cards[index].isActive;
-      cards[index].isClicked = false;
+      snapshot.data![index].isActived = !snapshot.data![index].isActived;
+      snapshot.data![index].isClicked = false;
     });
   }
 
@@ -159,7 +132,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
             key: UniqueKey(),
             onDismissed: (_) {
               setState(() {
-                cards.removeAt(index);
+                snapshot.data!.removeAt(index);
               });
             },
             background: Container(
@@ -210,7 +183,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                                 Switch(
                                   value: card.isActived,
                                   onChanged: (newValue) {
-                                    switchState(index);
+                                    switchState(index, snapshot);
                                   },
                                   activeColor: const Color(0xff34C759),
                                 )
