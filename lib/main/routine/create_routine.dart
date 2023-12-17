@@ -10,6 +10,9 @@ class CreateRoutine extends StatefulWidget {
 class _CreateRoutineState extends State<CreateRoutine> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
+  final TextEditingController _tagController = TextEditingController();
+
+  final List<String> _tags = [];
   String _selectedCategory = '카운트'; // 초기값 설정
   String _selectedPeriod = '매일'; // 초기값 설정
   List<String> daysOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
@@ -95,57 +98,124 @@ class _CreateRoutineState extends State<CreateRoutine> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('구분',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    value: _selectedCategory,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedCategory = newValue!;
-                      });
-                    },
-                    items: <String>['카운트', '퍼센트', '체크박스']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('구분',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(children: [
+                        Checkbox(
+                          value: _selectedCategory != '체크박스',
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _selectedCategory = value! ? '카운트' : '체크박스';
+                            });
+                          },
+                          activeColor: Colors.black,
+                        ),
+                        const Text('목표설정',
+                            style: TextStyle(fontWeight: FontWeight.normal)),
+                      ])
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                          color: Colors.black,
+                          style: BorderStyle.solid,
+                          width: 0.80),
+                    ),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedCategory,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedCategory = newValue!;
+                        });
+                      },
+                      items: <String>['카운트', '퍼센트', '체크박스']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
 
               // 목표 입력창
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('목표',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextField(
-                    controller: _goalController,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
+              if (_selectedCategory != '체크박스')
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('목표',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: _goalController,
+                      decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(height: 20),
 
               // 태그 입력창
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('태그',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextField(
-                    controller: _goalController,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('태그',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: _tagController,
+                      onSubmitted: (String value) {
+                        // 엔터를 누를 때마다 입력된 단어를 리스트에 추가
+                        setState(() {
+                          _tags.add(value);
+                          _tagController.clear(); // 입력창 비우기
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    // 입력된 태그를 리스트로 표시
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: _tags
+                          .map(
+                            (tag) => Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffEBF6E1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    tag,
+                                    style: const TextStyle(
+                                        color: Color(0xff64705B)), // Text color
+                                  ),
+                                ),
+                                const SizedBox(
+                                    width: 8), // Adjust the width as needed
+                              ],
+                            ),
+                          )
+                          .toList(),
+                    )
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
 
@@ -178,49 +248,46 @@ class _CreateRoutineState extends State<CreateRoutine> {
                   ),
                   const SizedBox(height: 10),
                   Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 193, 190, 190),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15.0),
-                              border: Border.all(
-                                  color: Colors.black,
-                                  style: BorderStyle.solid,
-                                  width: 0.80),
-                            ),
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              value: _selectedPeriod,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedPeriod = newValue!;
-                                  // 주기에 따라 선택된 요일 업데이트
-                                  updateSelectedDays();
-                                });
-                              },
-                              items: <String>[
-                                '매일',
-                                '평일',
-                                '주말'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 193, 190, 190),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15.0),
+                            border: Border.all(
+                                color: Colors.black,
+                                style: BorderStyle.solid,
+                                width: 0.80),
                           ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: daysOfWeek
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: _selectedPeriod,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedPeriod = newValue!;
+                                // 주기에 따라 선택된 요일 업데이트
+                                updateSelectedDays();
+                              });
+                            },
+                            items: <String>['매일', '평일', '주말']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ...daysOfWeek
                                 .map((day) => InkWell(
                                       onTap: () {
                                         setState(() {
@@ -255,9 +322,56 @@ class _CreateRoutineState extends State<CreateRoutine> {
                                       ),
                                     ))
                                 .toList(),
-                          ),
-                        ],
-                      )),
+                            // 시간 추가 버튼
+                            InkWell(
+                              onTap: () {
+                                // 시간 추가 로직
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 30,
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.black,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: const Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.add,
+                                          color: Colors.white, size: 10.0),
+                                      Text(
+                                        '시간',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.all(8.0),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.start,
+                        //     children: [
+                        //       TextField(
+                        //         controller: _goalController,
+                        //         decoration: const InputDecoration(
+                        //           border: UnderlineInputBorder(),
+                        //         ),
+                        //       ),
+                        //       const Icon(Icons.delete_forever)
+                        //     ],
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -266,19 +380,37 @@ class _CreateRoutineState extends State<CreateRoutine> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Bottom Sheet를 닫는 메서드 호출
-                      Navigator.pop(context);
-                    },
-                    child: const Text('취소'),
+                  SizedBox(
+                    width: 120,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(
+                            color: Color(0xFF64705B)), // Border color
+                      ),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Bottom Sheet를 닫는 메서드 호출
-                      Navigator.pop(context);
-                    },
-                    child: const Text('저장'),
+                  SizedBox(
+                    width: 120,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF64705B),
+                      ),
+                      child: const Text(
+                        '저장',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
                 ],
               ),
