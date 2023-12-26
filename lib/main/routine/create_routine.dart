@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifelog/services/api_services.dart';
 
 class CreateRoutine extends StatefulWidget {
   const CreateRoutine({super.key});
@@ -18,6 +19,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
   List<String> daysOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
   List<String> selectedDays = [];
   bool isChecked = false;
+
+  Map<String, dynamic> routineData = {};
 
   void toggleSelectedDay(String day) {
     if (_selectedPeriod == '매일') {
@@ -60,6 +63,43 @@ class _CreateRoutineState extends State<CreateRoutine> {
         selectedDays.clear();
       }
     });
+  }
+
+  // void createRoutineData() {
+  //   routineData = {
+  //     "name": _nameController.text,
+  //     "type": _selectedCategory == '카운트'
+  //         ? 'count'
+  //         : _selectedCategory == '퍼센트'
+  //             ? 'percent'
+  //             : 'checkbox',
+  //     "datetime": {
+  //       "monday": {"start": "09:00", "end": "18:00"}
+  //     },
+  //     "isActived": true,
+  //     "goal":
+  //         int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
+  //     "routineTags": _tagController.text.isNotEmpty
+  //         ? [_tagController.text]
+  //         : [], // 태그가 비어 있지 않으면 리스트에 추가
+  //     "activedAt": DateTime.now().toIso8601String(),
+  //     "inactivedAt": DateTime.now().toIso8601String(),
+  //   };
+  // }
+
+  void createRoutineData() {
+    routineData = {
+      "name": "운동하자",
+      "type": "count",
+      "datetime": {
+        "wednesday": {"start": "09:00", "end": "18:00"}
+      },
+      "isActived": true,
+      "goal": 5,
+      "routineTags": ["스쿼트"],
+      "activedAt": DateTime.now().toIso8601String(),
+      "inactivedAt": DateTime.now().toIso8601String(),
+    };
   }
 
   @override
@@ -432,7 +472,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
               SizedBox(
                 width: 120,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    createRoutineData();
+                    await ApiService.createRoutine(routineData);
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(

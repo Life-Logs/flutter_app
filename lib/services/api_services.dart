@@ -34,4 +34,29 @@ class ApiService {
       throw Exception('Failed to load album');
     }
   }
+
+  static Future createRoutine(routineData) async {
+    try {
+      final url = Uri.parse('$baseUrl/routine');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer $authToken',
+        },
+        body: jsonEncode(routineData),
+      );
+
+      if (response.statusCode == 201) {
+        final body = response.body;
+        return body;
+      } else {
+        print("Failed to create routine. Status code: ${response.statusCode}");
+        return (response.body);
+      }
+    } catch (e) {
+      return ("Error: $e");
+    }
+  }
 }
