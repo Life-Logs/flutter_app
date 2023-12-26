@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifelog/main/routine/create_routine.dart';
 import 'package:lifelog/models/routine_model.dart';
 import 'package:lifelog/services/api_services.dart';
+import 'package:intl/intl.dart';
 
 class RoutineWidget extends StatefulWidget {
   const RoutineWidget({super.key});
@@ -34,10 +35,12 @@ class _RoutineWidgetState extends State<RoutineWidget> {
   final Future<List<RoutineModel>> futureRoutine = ApiService.getAllRoutine();
   final Map<int, bool> clickedStateMap = {};
 
-  void toggleCardState(int id) {
-    setState(() {
-      clickedStateMap[id] = !(clickedStateMap[id] ?? false);
-    });
+  void toggleCardState(int id, bool isActived) {
+    if (isActived) {
+      setState(() {
+        clickedStateMap[id] = !(clickedStateMap[id] ?? false);
+      });
+    }
   }
 
   void switchState(int index, AsyncSnapshot<List<RoutineModel>> snapshot) {
@@ -47,8 +50,25 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     });
   }
 
-  Widget buildInfoRow(String? label, String? value, List? tag) {
+  Widget buildInfoRow(String? label, dynamic value, List? tag) {
     String tagValue = tag?.map((tag) => '#$tag').join(' ') ?? '';
+    String formattedValue = '';
+
+    if (value is Map<String, dynamic>) {
+      if (value.length == 1) {
+        var key = value.keys.first;
+        formattedValue = key;
+        // var innerMap = value[key] as Map<String, dynamic>;
+        // formattedValue = '$key: ${innerMap['start']} - ${innerMap['end']}';
+      }
+    } else if (value is DateTime) {
+      formattedValue = DateFormat('yyyy-MM-dd').format(value.toLocal());
+    } else if (value is String) {
+      formattedValue = value;
+    } else {
+      formattedValue = '';
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -69,7 +89,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
           ),
           const SizedBox(width: 20),
           Text(
-            value ?? '',
+            formattedValue ?? '',
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -145,10 +165,12 @@ class _RoutineWidgetState extends State<RoutineWidget> {
             child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: GestureDetector(
-                  onTap: () => toggleCardState(card.id),
+                  onTap: () => toggleCardState(card.id, card.isActived),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    height: clickedStateMap[card.id] ?? false ? 200 : 60,
+                    height: clickedStateMap[card.id] == true && card.isActived
+                        ? 200
+                        : 60,
                     decoration: BoxDecoration(
                       color: card.isActived
                           ? const Color(0xfff5fdee)
@@ -173,12 +195,20 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  card.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      card.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    if (clickedStateMap[card.id] == false ||
+                                        clickedStateMap[card.id] == null)
+                                      buildInfoRow('', null, card.routineTags),
+                                  ],
                                 ),
                                 Switch(
                                   value: card.isActived,
@@ -186,7 +216,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                                     switchState(index, snapshot);
                                   },
                                   activeColor: const Color(0xff34C759),
-                                )
+                                ),
                               ],
                             ),
                             if (card.isActived &&
@@ -194,10 +224,8 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                               Column(
                                 children: [
                                   buildInfoRow('구분', card.type, null),
-                                  buildInfoRow(
-                                      '반복', card.datetime.toString(), null),
-                                  buildInfoRow(
-                                      '활성', card.activedAt.toString(), null),
+                                  buildInfoRow('반복', card.datetime, null),
+                                  buildInfoRow('활성', card.activedAt, null),
                                   const SizedBox(
                                     height: 10,
                                   ),
