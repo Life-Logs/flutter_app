@@ -57,7 +57,17 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     if (value is Map<String, dynamic>) {
       if (value.length == 1) {
         var key = value.keys.first;
-        formattedValue = key;
+        Map<String, String> dayOfWeekMap = {
+          'monday': '월요일',
+          'tuesday': '화요일',
+          'wednesday': '수요일',
+          'thursday': '목요일',
+          'friday': '금요일',
+          'saturday': '토요일',
+          'sunday': '일요일',
+        };
+
+        formattedValue = dayOfWeekMap[key] ?? key;
         // var innerMap = value[key] as Map<String, dynamic>;
         // formattedValue = '$key: ${innerMap['start']} - ${innerMap['end']}';
       }
