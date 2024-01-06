@@ -12,6 +12,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
+  final TextEditingController _startTimeController = TextEditingController();
+  final TextEditingController _endTimeController = TextEditingController();
 
   final List<String> _tags = [];
   String _selectedCategory = '카운트'; // 초기값 설정
@@ -65,41 +67,52 @@ class _CreateRoutineState extends State<CreateRoutine> {
     });
   }
 
+  void createRoutineData() {
+    routineData = {
+      "name": _nameController.text,
+      "type": _selectedCategory == '카운트'
+          ? 'count'
+          : _selectedCategory == '퍼센트'
+              ? 'percent'
+              : 'checkbox',
+      "datetime": {
+        "monday": {"start": "09:00", "end": "18:00"}
+      },
+      "isActived": true,
+      "goal":
+          int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
+      "routineTags": _tags, // 태그가 비어 있지 않으면 리스트에 추가
+      "activedAt": DateTime.now().toIso8601String(),
+      "inactivedAt": DateTime.now().toIso8601String(),
+    };
+  }
+
   // void createRoutineData() {
   //   routineData = {
-  //     "name": _nameController.text,
-  //     "type": _selectedCategory == '카운트'
-  //         ? 'count'
-  //         : _selectedCategory == '퍼센트'
-  //             ? 'percent'
-  //             : 'checkbox',
+  //     "name": "운동하자",
+  //     "type": "count",
   //     "datetime": {
-  //       "monday": {"start": "09:00", "end": "18:00"}
+  //       "wednesday": {"start": "09:00", "end": "18:00"}
   //     },
   //     "isActived": true,
-  //     "goal":
-  //         int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
-  //     "routineTags": _tagController.text.isNotEmpty
-  //         ? [_tagController.text]
-  //         : [], // 태그가 비어 있지 않으면 리스트에 추가
+  //     "goal": 5,
+  //     "routineTags": ["스쿼트"],
   //     "activedAt": DateTime.now().toIso8601String(),
   //     "inactivedAt": DateTime.now().toIso8601String(),
   //   };
   // }
 
-  void createRoutineData() {
-    routineData = {
-      "name": "운동하자",
-      "type": "count",
-      "datetime": {
-        "wednesday": {"start": "09:00", "end": "18:00"}
-      },
-      "isActived": true,
-      "goal": 5,
-      "routineTags": ["스쿼트"],
-      "activedAt": DateTime.now().toIso8601String(),
-      "inactivedAt": DateTime.now().toIso8601String(),
-    };
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
+    TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (picked != null) {
+      String formattedTime = picked.format(context);
+      controller.text = formattedTime;
+    }
   }
 
   @override
@@ -425,22 +438,45 @@ class _CreateRoutineState extends State<CreateRoutine> {
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: TextField(
-                              decoration: InputDecoration(
-                                suffixIcon: Icon(Icons.delete_forever,
+                              controller: _startTimeController,
+                              readOnly: true,
+                              onTap: () =>
+                                  _selectTime(context, _startTimeController),
+                              decoration: const InputDecoration(
+                                labelText: 'Start Time',
+                                suffixIcon: Icon(Icons.access_time,
                                     color: Colors.black54),
                               ),
-                              // TextField properties go here
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                            width:
+                                16.0), // Add some spacing between the text fields
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              controller: _endTimeController,
+                              readOnly: true,
+                              onTap: () =>
+                                  _selectTime(context, _endTimeController),
+                              decoration: const InputDecoration(
+                                labelText: 'End Time',
+                                suffixIcon: Icon(Icons.access_time,
+                                    color: Colors.black54),
+                              ),
                             ),
                           ),
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
