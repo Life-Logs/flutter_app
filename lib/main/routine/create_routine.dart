@@ -12,12 +12,15 @@ class _CreateRoutineState extends State<CreateRoutine> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
+  final TextEditingController _startTimeController = TextEditingController();
+  final TextEditingController _endTimeController = TextEditingController();
 
   final List<String> _tags = [];
   String _selectedCategory = '카운트'; // 초기값 설정
   String _selectedPeriod = '매주'; // 초기값 설정
   List<String> daysOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
   List<String> selectedDays = [];
+  List<Widget> timeRows = [];
   bool isChecked = false;
 
   Map<String, dynamic> routineData = {};
@@ -65,41 +68,98 @@ class _CreateRoutineState extends State<CreateRoutine> {
     });
   }
 
-  // void createRoutineData() {
-  //   routineData = {
-  //     "name": _nameController.text,
-  //     "type": _selectedCategory == '카운트'
-  //         ? 'count'
-  //         : _selectedCategory == '퍼센트'
-  //             ? 'percent'
-  //             : 'checkbox',
-  //     "datetime": {
-  //       "monday": {"start": "09:00", "end": "18:00"}
-  //     },
-  //     "isActived": true,
-  //     "goal":
-  //         int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
-  //     "routineTags": _tagController.text.isNotEmpty
-  //         ? [_tagController.text]
-  //         : [], // 태그가 비어 있지 않으면 리스트에 추가
-  //     "activedAt": DateTime.now().toIso8601String(),
-  //     "inactivedAt": DateTime.now().toIso8601String(),
-  //   };
-  // }
-
   void createRoutineData() {
     routineData = {
-      "name": "운동하자",
-      "type": "count",
+      "name": _nameController.text,
+      "type": _selectedCategory == '카운트'
+          ? 'count'
+          : _selectedCategory == '퍼센트'
+              ? 'percent'
+              : 'checkbox',
       "datetime": {
-        "wednesday": {"start": "09:00", "end": "18:00"}
+        "monday": {
+          "start": _startTimeController.text,
+          "end": _endTimeController.text
+        }
       },
       "isActived": true,
-      "goal": 5,
-      "routineTags": ["스쿼트"],
+      "goal":
+          int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
+      "routineTags": _tags, // 태그가 비어 있지 않으면 리스트에 추가
       "activedAt": DateTime.now().toIso8601String(),
       "inactivedAt": DateTime.now().toIso8601String(),
     };
+  }
+
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
+    TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (picked != null) {
+      String formattedTime = picked.format(context);
+      controller.text = convertTo24HourFormat(formattedTime);
+    }
+  }
+
+  String convertTo24HourFormat(String inputTime) {
+    List<String> parts = inputTime.split(' ');
+    List<String> timeParts = parts[0].split(':');
+    int hours = int.parse(timeParts[0]);
+    int minutes = int.parse(timeParts[1]);
+
+    if (parts[1] == 'PM' && hours != 12) {
+      hours += 12;
+    } else if (parts[1] == 'AM' && hours == 12) {
+      hours = 0;
+    }
+    print(selectedDays);
+
+    String formattedTime =
+        '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+
+    return formattedTime;
+  }
+
+  void _addTimeRow() {
+    setState(() {
+      timeRows.add(
+        Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _startTimeController,
+                  readOnly: true,
+                  onTap: () => _selectTime(context, _startTimeController),
+                  decoration: const InputDecoration(
+                    labelText: 'Start Time',
+                    suffixIcon: Icon(Icons.access_time, color: Colors.black54),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _endTimeController,
+                  readOnly: true,
+                  onTap: () => _selectTime(context, _endTimeController),
+                  decoration: const InputDecoration(
+                    labelText: 'End Time',
+                    suffixIcon: Icon(Icons.access_time, color: Colors.black54),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   @override
@@ -341,7 +401,6 @@ class _CreateRoutineState extends State<CreateRoutine> {
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedPeriod = newValue!;
-                            // 주기에 따라 선택된 요일 업데이트
                             updateSelectedDays();
                           });
                         },
@@ -396,7 +455,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
                         // 시간 추가 버튼
                         InkWell(
                           onTap: () {
-                            // 시간 추가 로직
+                            _addTimeRow();
                           },
                           child: Container(
                             width: 40,
@@ -425,22 +484,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
                         ),
                       ],
                     ),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                suffixIcon: Icon(Icons.delete_forever,
-                                    color: Colors.black54),
-                              ),
-                              // TextField properties go here
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    Column(children: timeRows),
                   ],
                 ),
               ),
