@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifelog/main/routine/widgets/date_selector.dart';
 import 'package:lifelog/services/api_services.dart';
 
 class CreateRoutine extends StatefulWidget {
@@ -24,6 +25,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
   bool isChecked = false;
 
   Map<String, dynamic> routineData = {};
+  DateTime? startDate;
+  DateTime? endDate;
 
   void toggleSelectedDay(String day) {
     if (_selectedPeriod == '매일') {
@@ -86,8 +89,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
       "goal":
           int.tryParse(_goalController.text) ?? 0, // 목표를 정수로 변환, 실패하면 0으로 설정
       "routineTags": _tags, // 태그가 비어 있지 않으면 리스트에 추가
-      "activedAt": DateTime.now().toIso8601String(),
-      "inactivedAt": DateTime.now().toIso8601String(),
+      "activedAt": startDate!.toIso8601String(),
+      "inactivedAt": endDate!.toIso8601String(),
     };
   }
 
@@ -115,7 +118,6 @@ class _CreateRoutineState extends State<CreateRoutine> {
     } else if (parts[1] == 'AM' && hours == 12) {
       hours = 0;
     }
-    print(selectedDays);
 
     String formattedTime =
         '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
@@ -159,6 +161,31 @@ class _CreateRoutineState extends State<CreateRoutine> {
           ],
         ),
       );
+    });
+  }
+
+  Widget buildDateRow(String labelText, Widget dateSelector) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          labelText,
+          style: const TextStyle(fontWeight: FontWeight.w400),
+        ),
+        dateSelector,
+      ],
+    );
+  }
+
+  void _handleStartDateChanged(DateTime date) {
+    setState(() {
+      startDate = date;
+    });
+  }
+
+  void _handleEndDateChanged(DateTime date) {
+    setState(() {
+      endDate = date;
     });
   }
 
@@ -330,53 +357,11 @@ class _CreateRoutineState extends State<CreateRoutine> {
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('언제부터 시작할까요?',
-                      style: TextStyle(fontWeight: FontWeight.w400)),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 193, 190, 190),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: const Text(
-                      '23.12.06',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('언제까지 할까요?',
-                      style: TextStyle(fontWeight: FontWeight.w400)),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 193, 190, 190),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: const Text(
-                      '23.12.06',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              buildDateRow('언제부터 시작할까요?',
+                  DateSelector(onDateChanged: _handleStartDateChanged)),
+              const SizedBox(height: 10),
+              buildDateRow('언제까지 할까요?',
+                  DateSelector(onDateChanged: _handleEndDateChanged)),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(8.0),
