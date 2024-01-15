@@ -137,7 +137,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     );
   }
 
-  void _showAddRoutineCard() {
+  void _showAddRoutineCard({RoutineModel? existingRoutine}) {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -148,7 +148,10 @@ class _RoutineWidgetState extends State<RoutineWidget> {
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return const CreateRoutine();
+        return CreateRoutine(
+          existingRoutine: existingRoutine,
+          isEditing: existingRoutine != null,
+        );
       },
     );
   }
@@ -220,13 +223,21 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                                       buildInfoRow('', null, card.routineTags),
                                   ],
                                 ),
-                                Switch(
-                                  value: card.isActived,
-                                  onChanged: (newValue) {
-                                    switchState(index, snapshot);
-                                  },
-                                  activeColor: const Color(0xff34C759),
-                                ),
+                                clickedStateMap[card.id] == true &&
+                                        card.isActived
+                                    ? IconButton(
+                                        icon: const Icon(Icons.edit_square),
+                                        onPressed: () {
+                                          _showAddRoutineCard(
+                                              existingRoutine: card);
+                                        })
+                                    : Switch(
+                                        value: card.isActived,
+                                        onChanged: (newValue) {
+                                          switchState(index, snapshot);
+                                        },
+                                        activeColor: const Color(0xff34C759),
+                                      )
                               ],
                             ),
                             if (card.isActived &&

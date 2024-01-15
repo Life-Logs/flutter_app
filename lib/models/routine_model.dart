@@ -5,6 +5,7 @@ class RoutineModel {
   final List<String> routineTags;
   final DateTime? activedAt, inactivedAt;
   final Map<String, dynamic> datetime;
+  final int? goal;
 
   RoutineModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -19,5 +20,6 @@ class RoutineModel {
         inactivedAt = json['inactivedAt'] != null
             ? DateTime.parse(json['inactivedAt'])
             : null,
-        isClicked = false;
+        isClicked = false,
+        goal = json['goal'];
 }

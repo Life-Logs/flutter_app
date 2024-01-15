@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:lifelog/main/routine/widgets/date_selector.dart';
+import 'package:lifelog/models/routine_model.dart';
 import 'package:lifelog/services/api_services.dart';
 
 class CreateRoutine extends StatefulWidget {
-  const CreateRoutine({super.key});
+  final RoutineModel? existingRoutine;
+  final bool isEditing;
+
+  const CreateRoutine({
+    Key? key,
+    this.existingRoutine,
+    this.isEditing = false,
+  }) : super(key: key);
 
   @override
   State<CreateRoutine> createState() => _CreateRoutineState();
@@ -15,8 +23,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
+  final Map<String, TextEditingController> _dayControllers = {};
 
-  final List<String> _tags = [];
+  List<String> _tags = [];
   String _selectedCategory = '카운트'; // 초기값 설정
   String _selectedPeriod = '매주'; // 초기값 설정
   List<String> daysOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
@@ -27,6 +36,32 @@ class _CreateRoutineState extends State<CreateRoutine> {
   Map<String, dynamic> routineData = {};
   DateTime? startDate;
   DateTime? endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    for (var day in daysOfWeek) {
+      _dayControllers[day] = TextEditingController();
+    }
+
+    if (widget.isEditing && widget.existingRoutine != null) {
+      _nameController.text = widget.existingRoutine!.name ?? '';
+      _tags = List.from(widget.existingRoutine!.routineTags);
+      _selectedCategory = (widget.existingRoutine!.type == 'percent'
+          ? '퍼센트'
+          : widget.existingRoutine!.type == 'count'
+              ? '카운트'
+              : '체크박스');
+      for (var day in daysOfWeek) {
+        if (widget.existingRoutine!.datetime.containsKey(day)) {
+          _startTimeController.text =
+              widget.existingRoutine!.datetime[day]!['start'] ?? '';
+          _endTimeController.text =
+              widget.existingRoutine!.datetime[day]!['end'] ?? '';
+        }
+      }
+    }
+  }
 
   void toggleSelectedDay(String day) {
     if (_selectedPeriod == '매일') {
@@ -195,9 +230,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
       padding: const EdgeInsets.all(30),
       child: Column(
         children: [
-          const Text(
-            '루틴 추가',
-            style: TextStyle(
+          Text(
+            widget.isEditing ? '루틴 수정' : '루틴 추가',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w500,
             ),
