@@ -72,7 +72,31 @@ class ApiService {
         final body = response.body;
         return body;
       } else {
-        print("Failed to update routine. Status code: ${response.statusCode}");
+        print("Failed to delete routine. Status code: ${response.statusCode}");
+        return (response.body);
+      }
+    } catch (e) {
+      return ("Error: $e");
+    }
+  }
+
+  static Future toggleRoutine(id, toggleBool) async {
+    try {
+      final url = Uri.parse('$baseUrl/routine/$id/toggle-activation');
+
+      final response = await http.patch(url,
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer $authToken',
+          },
+          body: jsonEncode({"isActived": toggleBool}));
+
+      if (response.statusCode == 201) {
+        final body = response.body;
+        return body;
+      } else {
+        print(
+            "Failed to update activation routine. Status code: ${response.statusCode}");
         return (response.body);
       }
     } catch (e) {

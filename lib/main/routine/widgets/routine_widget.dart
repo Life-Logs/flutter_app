@@ -43,11 +43,13 @@ class _RoutineWidgetState extends State<RoutineWidget> {
     }
   }
 
-  void switchState(int index, AsyncSnapshot<List<RoutineModel>> snapshot) {
+  void switchState(
+      int id, int index, AsyncSnapshot<List<RoutineModel>> snapshot) async {
     setState(() {
       snapshot.data![index].isActived = !snapshot.data![index].isActived;
       snapshot.data![index].isClicked = false;
     });
+    await ApiService.toggleRoutine(id, snapshot.data![index].isActived);
   }
 
   Widget buildInfoRow(String? label, dynamic value, List? tag) {
@@ -241,7 +243,7 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                                     : Switch(
                                         value: card.isActived,
                                         onChanged: (newValue) {
-                                          switchState(index, snapshot);
+                                          switchState(card.id, index, snapshot);
                                         },
                                         activeColor: const Color(0xff34C759),
                                       )
