@@ -59,4 +59,24 @@ class ApiService {
       return ("Error: $e");
     }
   }
+  static Future deleteRoutine(id) async {
+    try {
+      final url = Uri.parse('$baseUrl/routine/$id');
+
+      final response = await http.delete(url, headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': 'Bearer $authToken',
+      });
+
+      if (response.statusCode == 201) {
+        final body = response.body;
+        return body;
+      } else {
+        print("Failed to update routine. Status code: ${response.statusCode}");
+        return (response.body);
+      }
+    } catch (e) {
+      return ("Error: $e");
+    }
+  }
 }

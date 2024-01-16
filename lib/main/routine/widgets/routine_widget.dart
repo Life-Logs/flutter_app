@@ -163,10 +163,17 @@ class _RoutineWidgetState extends State<RoutineWidget> {
 
           return Dismissible(
             key: UniqueKey(),
-            onDismissed: (_) {
+            onDismissed: (_) async {
               setState(() {
                 snapshot.data!.removeAt(index);
               });
+              await ApiService.deleteRoutine(card.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('루틴 삭제 성공!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
             background: Container(
                 alignment: Alignment.centerRight,
