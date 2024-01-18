@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
 import 'package:lifelog/home/home_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+Future main() async {
+  await dotenv.load(fileName: '.env');
+
+  final apikey = dotenv.env['KAKAO_NATIVE_APP_KEY'];
+  KakaoSdk.init(nativeAppKey: apikey);
+
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
