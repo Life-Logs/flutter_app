@@ -165,17 +165,45 @@ class _RoutineWidgetState extends State<RoutineWidget> {
 
           return Dismissible(
             key: UniqueKey(),
-            onDismissed: (_) async {
-              setState(() {
-                snapshot.data!.removeAt(index);
-              });
-              await ApiService.deleteRoutine(card.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('루틴 삭제 성공!'),
-                  duration: Duration(seconds: 2),
-                ),
+            onDismissed: (direction) async {
+              bool? confirmDelete = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('삭제하시겠습니까?'),
+                    content: const Text('삭제 버튼을 누르시면 루틴이 삭제됩니다.'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('취소'),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('삭제'),
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
+
+              if (confirmDelete == true) {
+                setState(() {
+                  snapshot.data!.removeAt(index);
+                });
+                await ApiService.deleteRoutine(card.id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('루틴 삭제 성공!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                setState(() {});
+              }
             },
             background: Container(
                 alignment: Alignment.centerRight,
