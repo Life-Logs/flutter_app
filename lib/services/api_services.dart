@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:lifelog/models/routine_model.dart';
 import 'package:lifelog/services/shared_pref.dart';
 
 class ApiService {
-  static const String baseUrl = "https://dev.lifelog.devtkim.com";
+  static final String baseUrl = dotenv.env['API_HOST'] ?? '';
 
   static Future getId() async {
     final url = Uri.parse('$baseUrl/auth/login');
@@ -59,6 +60,7 @@ class ApiService {
       return ("Error: $e");
     }
   }
+
   static Future deleteRoutine(id) async {
     try {
       final url = Uri.parse('$baseUrl/routine/$id');
