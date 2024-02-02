@@ -39,12 +39,13 @@ class ApiService {
   static Future createRoutine(routineData) async {
     try {
       final url = Uri.parse('$baseUrl/routine');
+      String? token = await _getToken();
 
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer $authToken',
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode(routineData),
       );
@@ -64,10 +65,11 @@ class ApiService {
   static Future deleteRoutine(id) async {
     try {
       final url = Uri.parse('$baseUrl/routine/$id');
+      String? token = await _getToken();
 
       final response = await http.delete(url, headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': 'Bearer $authToken',
+        'Authorization': 'Bearer $token',
       });
 
       if (response.statusCode == 201) {
@@ -85,11 +87,12 @@ class ApiService {
   static Future toggleRoutine(id, toggleBool) async {
     try {
       final url = Uri.parse('$baseUrl/routine/$id/toggle-activation');
+      String? token = await _getToken();
 
       final response = await http.patch(url,
           headers: {
             'Content-Type': 'application/json',
-            // 'Authorization': 'Bearer $authToken',
+            'Authorization': 'Bearer $token',
           },
           body: jsonEncode({"isActived": toggleBool}));
 
