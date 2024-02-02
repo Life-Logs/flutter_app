@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:lifelog/main/routine/widgets/routine_widget.dart';
 
 class MainScreen extends StatefulWidget {
@@ -14,7 +13,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
-    getUserInfo();
     super.initState();
   }
 
@@ -34,14 +32,6 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _currentIndex = newIndex;
     });
-  }
-
-  void getUserInfo() async {
-    final User user = await UserApi.instance.me();
-    print('사용자 정보 요청 성공'
-        '\n회원번호: ${user.id}'
-        '\n닉네임: ${user.kakaoAccount?.profile?.nickname}'
-        '\n이메일: ${user.kakaoAccount?.email}');
   }
 
   @override

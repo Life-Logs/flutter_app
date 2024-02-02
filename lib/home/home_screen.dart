@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:lifelog/main/main_screen.dart';
+import 'package:lifelog/services/api_services.dart';
+import 'package:lifelog/services/auth_store.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -46,8 +50,23 @@ class HomeScreen extends StatelessWidget {
   void signIn(BuildContext context) async {
     if (await isKakaoTalkInstalled()) {
       try {
-        await UserApi.instance.loginWithKakaoTalk();
-        print('카카오톡으로 로그인 성공');
+        OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
+        TokenStorage tokenStorage = TokenStorage();
+        String accessToken = token.accessToken;
+
+        Map<String, dynamic> data = {'accessToken': accessToken};
+        final response = await ApiService.kakaoLogin(data);
+        print(response);
+        Map<String, dynamic> parsedJson = json.decode(response.body);
+
+        String myAccessToken = parsedJson['accessToken'];
+        tokenStorage.saveToken(myAccessToken);
+
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const MainScreen(),
+        ));
+
+        print('$token 카카오톡으로 로그인 성공');
       } catch (error) {
         print('카카오톡으로 로그인 실패 $error');
 
@@ -58,8 +77,18 @@ class HomeScreen extends StatelessWidget {
         }
         // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
         try {
-          await UserApi.instance.loginWithKakaoAccount();
-          print('카카오계정으로 로그인 성공');
+          OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+          TokenStorage tokenStorage = TokenStorage();
+          String accessToken = token.accessToken;
+
+          Map<String, dynamic> data = {'accessToken': accessToken};
+          final response = await ApiService.kakaoLogin(data);
+          print(response);
+          Map<String, dynamic> parsedJson = json.decode(response.body);
+
+          String myAccessToken = parsedJson['accessToken'];
+          tokenStorage.saveToken(myAccessToken);
+
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => const MainScreen(),
           ));
@@ -69,7 +98,18 @@ class HomeScreen extends StatelessWidget {
       }
     } else {
       try {
-        await UserApi.instance.loginWithKakaoAccount();
+        OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+        TokenStorage tokenStorage = TokenStorage();
+        String accessToken = token.accessToken;
+
+        Map<String, dynamic> data = {'accessToken': accessToken};
+        final response = await ApiService.kakaoLogin(data);
+        print(response.body);
+        Map<String, dynamic> parsedJson = json.decode(response.body);
+
+        String myAccessToken = parsedJson['accessToken'];
+        tokenStorage.saveToken(myAccessToken);
+
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const MainScreen(),
         ));
@@ -79,26 +119,4 @@ class HomeScreen extends StatelessWidget {
       }
     }
   }
-// google login 창
-  // Future signIn(context) async {
-  //   final user = await GoogleSignInApi.login();
-
-  //   if (user == null) {
-  //     ScaffoldMessenger.of(context)
-  //         .showSnackBar(const SnackBar(content: Text('Sign in Failed')));
-  //   } else {
-  //     String accessToken =
-  //         await user.authentication.then((auth) => auth.accessToken!);
-  //     print('Access Token: $accessToken');
-  //     Navigator.of(context).pushReplacement(MaterialPageRoute(
-  //       builder: (context) => const MainScreen(),
-  //     ));
-  //   }
-  // }
-
-  // 로그인 인증 없이 로그인
-  // void signIn(BuildContext context) {
-  //   Navigator.push(
-  //       context, MaterialPageRoute(builder: (context) => const MainScreen()));
-  // }
 }

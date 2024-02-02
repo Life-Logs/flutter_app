@@ -3,29 +3,48 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:lifelog/models/routine_model.dart';
-import 'package:lifelog/services/shared_pref.dart';
+import 'package:lifelog/services/auth_store.dart';
 
 class ApiService {
   static final String baseUrl = dotenv.env['API_HOST'] ?? '';
 
-  static Future getId() async {
+  static Future<String?> _getToken() async {
+    TokenStorage tokenStorage = TokenStorage();
+    return tokenStorage.getToken();
+  }
+
+  static Future kakaoLogin(Map<String, dynamic> data) async {
     final url = Uri.parse('$baseUrl/auth/login');
-    final response = await http.get(url);
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(data),
+    );
 
     return response;
   }
 
-  static Future getUserInfo() async {
-    final headers = {'cookie': await getStoredCookie()};
-    final url = Uri.parse('$baseUrl/auth/cookie-validation');
-    final response = await http.get(url, headers: headers);
+  // static Future getUserInfo() async {
+  //   final headers = {'cookie': await getStoredCookie()};
+  //   final url = Uri.parse('$baseUrl/auth/cookie-validation');
+  //   final response = await http.get(url, headers: headers);
 
-    return response;
-  }
+  //   return response;
+  // }
 
   static Future<List<RoutineModel>> getAllRoutine() async {
     final url = Uri.parse('$baseUrl/routine');
-    final response = await http.get(url);
+    String? token = await _getToken();
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List)
