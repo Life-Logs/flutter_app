@@ -54,31 +54,41 @@ class _RoutineWidgetState extends State<RoutineWidget> {
 
   Widget buildInfoRow(String? label, dynamic value, List? tag) {
     String tagValue = tag?.map((tag) => '#$tag').join(' ') ?? '';
-    String formattedValue = '';
+    List<Widget> rowWidgets = [];
 
-    if (value is Map<String, dynamic>) {
-      if (value.length == 1) {
-        var key = value.keys.first;
-        Map<String, String> dayOfWeekMap = {
-          'monday': '월요일',
-          'tuesday': '화요일',
-          'wednesday': '수요일',
-          'thursday': '목요일',
-          'friday': '금요일',
-          'saturday': '토요일',
-          'sunday': '일요일',
-        };
-
-        formattedValue = dayOfWeekMap[key] ?? key;
-        // var innerMap = value[key] as Map<String, dynamic>;
-        // formattedValue = '$key: ${innerMap['start']} - ${innerMap['end']}';
+    if (value is List<dynamic>) {
+      for (var item in value) {
+        String formattedValue = item['day'].join('/');
+        rowWidgets.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              formattedValue,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        );
       }
     } else if (value is DateTime) {
-      formattedValue = DateFormat('yyyy-MM-dd').format(value.toLocal());
+      String formattedValue = DateFormat('yyyy-MM-dd').format(value.toLocal());
+      rowWidgets.add(Text(
+        formattedValue,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+        ),
+      ));
     } else if (value is String) {
-      formattedValue = value;
-    } else {
-      formattedValue = '';
+      rowWidgets.add(Text(
+        value,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+        ),
+      ));
     }
 
     return Padding(
@@ -100,12 +110,8 @@ class _RoutineWidgetState extends State<RoutineWidget> {
             ),
           ),
           const SizedBox(width: 20),
-          Text(
-            formattedValue ?? '',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
+          Column(
+            children: rowWidgets.isNotEmpty ? rowWidgets : [const Text('')],
           ),
         ],
       ),

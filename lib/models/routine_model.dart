@@ -4,7 +4,7 @@ class RoutineModel {
   bool isActived, isClicked;
   final List<String> routineTags;
   final DateTime? activedAt, inactivedAt;
-  final Map<String, dynamic> datetime;
+  final List<dynamic> datetime;
   final int? goal;
 
   RoutineModel.fromJson(Map<String, dynamic> json)
